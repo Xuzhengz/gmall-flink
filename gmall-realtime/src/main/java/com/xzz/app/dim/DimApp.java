@@ -3,15 +3,25 @@ package com.xzz.app.dim;
 import com.alibaba.fastjson.JSONObject;
 import com.ctc.wstx.io.EBCDICCodec;
 import com.google.gson.JsonObject;
+import com.ververica.cdc.connectors.mysql.source.MySqlSource;
+import com.ververica.cdc.connectors.mysql.table.StartupOptions;
+import com.ververica.cdc.debezium.JsonDebeziumDeserializationSchema;
+import com.xzz.app.function.TableProcessFunction;
+import com.xzz.bean.TableProcess;
 import com.xzz.utils.KafkaUtil;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
+import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
+import org.apache.flink.streaming.api.datastream.BroadcastConnectedStream;
+import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
 
@@ -54,13 +64,30 @@ public class DimApp {
                 }
             }
         });
+
         //TODO 4.Flink CDC 读取mysql配置信息表，创建配置流
+        MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
+                .hostname("hadoop102")
+                .port(3306)
+                .databaseList("gmall_config")
+                .tableList("gmall_config.table_process")
+                .username("root")
+                .password("000000")
+                .deserializer(new JsonDebeziumDeserializationSchema())
+                .startupOptions(StartupOptions.initial())
+                .build();
+
+        DataStreamSource<String> mysqlSource = env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "MysqlSource");
 
         //TODO 5.将配置流处理为广播流
+        MapStateDescriptor<String, TableProcess> mapState = new MapStateDescriptor<>("mapState", String.class, TableProcess.class);
+        BroadcastStream<String> broadcastStream = mysqlSource.broadcast(mapState);
 
         //TODO 6.连接主流和配置流
+        BroadcastConnectedStream<JSONObject, String> connectedStream = filterJsonStream.connect(broadcastStream);
 
         //TODO 7.处理连接流（根据配置信息处理主流数据）
+        connectedStream.process(new TableProcessFunction());
 
         //TODO 8.数据写出到Phoenix
 
