@@ -30,7 +30,7 @@ import org.apache.flink.util.Collector;
  * @date 2022/10/24-20:00
  */
 public class DimApp {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         //TODO 1.获取执行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1); // kakfa的分区数量
@@ -56,7 +56,8 @@ public class DimApp {
             public void flatMap(String s, Collector<JSONObject> collector) throws Exception {
                 try {
                     JSONObject jsonObject = JSONObject.parseObject(s);
-                    if (jsonObject.get("type").equals("insert") || jsonObject.get("type").equals("update") || jsonObject.get("type").equals("bootstrap-insert")) {
+                    String type = jsonObject.getString("type");
+                    if (type.equals("insert") || type.equals("update") || type.equals("bootstrap-insert")) {
                         collector.collect(jsonObject);
                     }
                 } catch (Exception e) {
@@ -87,9 +88,12 @@ public class DimApp {
         BroadcastConnectedStream<JSONObject, String> connectedStream = filterJsonStream.connect(broadcastStream);
 
         //TODO 7.处理连接流（根据配置信息处理主流数据）
-        connectedStream.process(new TableProcessFunction());
+        SingleOutputStreamOperator<JSONObject> dimDs = connectedStream.process(new TableProcessFunction(mapState));
 
         //TODO 8.数据写出到Phoenix
+//        dimDs.addSink(new PhoneixSink());
 
+
+        env.execute();
     }
 }
