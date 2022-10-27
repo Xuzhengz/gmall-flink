@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import com.ververica.cdc.connectors.mysql.table.StartupOptions;
 import com.ververica.cdc.debezium.JsonDebeziumDeserializationSchema;
+import com.xzz.app.function.PhoneixSink;
 import com.xzz.app.function.TableProcessFunction;
 import com.xzz.bean.TableProcess;
 import com.xzz.utils.KafkaUtil;
@@ -14,6 +15,9 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.state.MapStateDescriptor;
+import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
+import org.apache.flink.connector.jdbc.JdbcExactlyOnceOptions;
+import org.apache.flink.connector.jdbc.JdbcSink;
 import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.BroadcastConnectedStream;
@@ -90,10 +94,13 @@ public class DimApp {
         //TODO 7.处理连接流（根据配置信息处理主流数据）
         SingleOutputStreamOperator<JSONObject> dimDs = connectedStream.process(new TableProcessFunction(mapState));
 
-        //TODO 8.数据写出到Phoenix
-//        dimDs.addSink(new PhoneixSink());
+        dimDs.print(">>>>>>");
 
+        //TODO 8.数据写出到Phoenix，无法使用JdbcSink（适用于单表）
 
+        dimDs.addSink(new PhoneixSink());
+
+//        TODO 9.执行
         env.execute();
     }
 }
