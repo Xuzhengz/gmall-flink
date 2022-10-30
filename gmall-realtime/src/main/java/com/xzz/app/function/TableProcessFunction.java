@@ -52,7 +52,7 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
 
 //        写入状态，广播出去
         BroadcastState<String, TableProcess> broadcastState = context.getBroadcastState(mapStateDescriptor);
-        broadcastState.put(tableProcess.getSinkTable(), tableProcess);
+        broadcastState.put(tableProcess.getSourceTable(), tableProcess);
     }
 
 
@@ -119,7 +119,7 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
                 if (sinkPk.equals(column)) {
                     createTableSql.append(column).append(" varchar primary key ");
                 } else {
-                    createTableSql.append(column).append("varchar");
+                    createTableSql.append(column).append(" varchar");
                 }
                 //        判断是否最后一个字段
                 if (i < columns.length - 1) {

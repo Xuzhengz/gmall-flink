@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>hbase.rootdir</name>
+        <value>hdfs://hadoop102:8020/HBase</value>
+    </property>
+
+    <property>
+        <name>hbase.cluster.distributed</name>
+        <value>true</value>
+    </property>
+    <!-- 0.98 后的新变动，之前版本没有.port,默认端口为 60000 -->
+    <property>
+        <name>hbase.master.port</name>
+        <value>16000</value>
+    </property>
+
+    <property>
+        <name>hbase.zookeeper.quorum</name>
+        <value>hadoop102,hadoop103,hadoop104</value>
+    </property>
+
+    <property>
+        <name>hbase.zookeeper.property.dataDir</name>
+        <value>/opt/module/zookeeper-3.5.7/zkData</value>
+    </property>
+
+    <property>
+        <name>hbase.unsafe.stream.capability.enforce</name>
+        <!-- 解决一个报错 -->
+        <value>false</value>
+    </property>
+
+    <property>
+        <name>phoenix.schema.isNamespaceMappingEnabled</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>phoenix.schema.mapSystemTablesToNamespace</name>
+        <value>true</value>
+    </property>
+
+
+</configuration>
