@@ -19,6 +19,8 @@ import org.apache.flink.util.Collector;
 /**
  * @author 徐正洲
  * @create 2022-11-01 17:37
+ *
+ * 流量域-日活明细表
  */
 public class DwdUvDetail {
     public static void main(String[] args) throws Exception {

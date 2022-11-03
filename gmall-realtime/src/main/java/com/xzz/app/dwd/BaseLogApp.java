@@ -20,6 +20,8 @@ import org.apache.flink.util.OutputTag;
 /**
  * @author 徐正洲
  * @create 2022-10-31 16:58
+ *
+ * 流量域-日志数据分组
  */
 public class BaseLogApp {
     public static void main(String[] args) throws Exception {
