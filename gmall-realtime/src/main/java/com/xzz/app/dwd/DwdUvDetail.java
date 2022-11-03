@@ -5,16 +5,16 @@ import com.xzz.utils.DateFormatUtil;
 import com.xzz.utils.KafkaUtil;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.RichFilterFunction;
+import org.apache.flink.api.common.state.StateTtlConfig;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.common.time.Time;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
-
-import javax.xml.stream.events.EndElement;
 
 /**
  * @author 徐正洲
@@ -34,6 +34,8 @@ public class DwdUvDetail {
 //        env.setStateBackend(new HashMapStateBackend());
 //        env.getCheckpointConfig().setCheckpointStorage("hdfs://hadoop102:8020/gmall-flink/ck");
 //        System.setProperty("HADOOP_USER_NAME","root");
+
+
         //    TODO 2. 消费kafka中 dwd_traffic_page_log 主题数据创建流
         String topic = "dwd_traffic_page_log";
         String groupId = "dwdUvDetail";
@@ -62,8 +64,18 @@ public class DwdUvDetail {
 
             @Override
             public void open(Configuration parameters) throws Exception {
-                tsState = getRuntimeContext().getState(new ValueStateDescriptor<String>("tsState", String.class));
+                ValueStateDescriptor<String> valueStateDescriptor = new ValueStateDescriptor<>("tsState", String.class);
+
+                // 使用TTL优化状态,一天后若无创建和写入则删除状态，释放资源。
+                tsState = getRuntimeContext().getState(valueStateDescriptor);
+                StateTtlConfig stateTtlConfig = StateTtlConfig.newBuilder(Time.days(1))
+                        .setUpdateType(StateTtlConfig.UpdateType.OnCreateAndWrite)
+                        .build();
+
+                valueStateDescriptor.enableTimeToLive(stateTtlConfig);
             }
+
+
 
             @Override
             public boolean filter(JSONObject jsonObject) throws Exception {
