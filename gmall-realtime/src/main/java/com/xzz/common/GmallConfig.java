@@ -3,6 +3,8 @@ package com.xzz.common;
 /**
  * @author 徐正洲
  * @create 2022-10-26 15:27
+ *
+ * 实时数仓常量
  */
 public class GmallConfig {
     // Phoenix库名
