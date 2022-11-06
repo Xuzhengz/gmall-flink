@@ -13,6 +13,7 @@ import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
@@ -20,7 +21,7 @@ import org.apache.flink.util.OutputTag;
 /**
  * @author 徐正洲
  * @create 2022-10-31 16:58
- *
+ * <p>
  * 流量域-日志数据分组
  */
 public class BaseLogApp {
@@ -63,6 +64,7 @@ public class BaseLogApp {
 //    TODO 4. 按照mid分组
         KeyedStream<JSONObject, String> midStream = jsonObjDs.keyBy(data -> data.getJSONObject("common").getString("mid"));
 //    TODO 5. 使用状态编程新老访客标记的校验
+
         SingleOutputStreamOperator<JSONObject> jsWithNewFlag = midStream.map(new RichMapFunction<JSONObject, JSONObject>() {
             private ValueState<String> state;
 
@@ -77,20 +79,27 @@ public class BaseLogApp {
                 String is_new = jsonObject.getJSONObject("common").getString("is_new");
                 Long ts = jsonObject.getLong("ts");
                 String currentDate = DateFormatUtil.toDate(ts);
+
                 //获取状态中的日期
                 String lastDate = state.value();
-                if (is_new == "1") {
+                if ("1".equals(is_new)) {
                     if (lastDate == null) {
                         state.update(currentDate);
-                    } else if (!lastDate.equals(currentDate)) {
-                        jsonObject.getJSONObject("common").put("is_new", "0");
+                    } else {
+                        if (!lastDate.equals(currentDate)) {
+                            jsonObject.getJSONObject("common").put("is_new", "0");
+                        }
                     }
-                } else if (lastDate == null) {
-                    state.update(DateFormatUtil.toDate(ts - 24 * 60 * 60 * 1000L));
+                } else {
+                    if (lastDate == null) {
+                        state.update(DateFormatUtil.toDate(ts - 24 * 60 * 60 * 1000L));
+                    }
                 }
                 return jsonObject;
             }
         });
+
+
 //    TODO 6. 使用测输出流分流处理--页面日志为主流，其余为错输出流。
         OutputTag<String> startTag = new OutputTag<String>("start") {
         };
@@ -106,7 +115,7 @@ public class BaseLogApp {
                 //尝试获取错误信息
                 String err = jsonObject.getString("err");
                 if (err != null) {
-                    context.output(errorTag, err);
+                    context.output(errorTag, jsonObject.toJSONString());
                 }
                 //移除错误信息
                 jsonObject.remove("err");
@@ -114,7 +123,7 @@ public class BaseLogApp {
                 //尝试获取启动信息
                 String start = jsonObject.getString("start");
                 if (start != null) {
-                    context.output(startTag, start);
+                    context.output(startTag, jsonObject.toJSONString());
                 } else {
                     //获取公共信息、页面id、时间戳
                     String common = jsonObject.getString("common");

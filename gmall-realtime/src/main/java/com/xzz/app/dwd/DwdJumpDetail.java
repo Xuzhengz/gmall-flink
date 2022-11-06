@@ -45,7 +45,7 @@ public class DwdJumpDetail {
 //        System.setProperty("HADOOP_USER_NAME","root");
 
 
-        //    TODO 2. 消费kafka中 dwd_traffic_page_log 主题数据创建流
+        // TODO 2. 消费kafka中 dwd_traffic_page_log 主题数据创建流
         String topic = "dwd_traffic_page_log";
         String groupId = "dwdJumpDetail";
         DataStreamSource<String> kafkaDs = env.addSource(KafkaUtil.getFlinkKafkaConsumer(topic, groupId));
@@ -53,10 +53,12 @@ public class DwdJumpDetail {
         // TODO 3.将每行数据转换成JSON对象
         SingleOutputStreamOperator<JSONObject> jsonObj = kafkaDs.map(JSON::parseObject);
 
+
         // TODO 4.按照mid分组
         KeyedStream<JSONObject, String> keyedStream = jsonObj.assignTimestampsAndWatermarks(WatermarkStrategy.<JSONObject>forBoundedOutOfOrderness(Duration.ofSeconds(2)).withTimestampAssigner(new SerializableTimestampAssigner<JSONObject>() {
             @Override
             public long extractTimestamp(JSONObject jsonObject, long l) {
+                System.out.println(jsonObject.getLong("ts"));
                 return jsonObject.getLong("ts");
             }
         })).keyBy(data -> data.getJSONObject("common").getString("mid"));
@@ -93,8 +95,8 @@ public class DwdJumpDetail {
         DataStream<String> unionDs = selectDs.union(timeoutDs);
 
         // TODO 9.写出kafka
-        selectDs.print(">>>>>");
-        unionDs.print(">>>>>");
+        selectDs.print("select>>>>>");
+        unionDs.print("union>>>>>");
         String sinkTopic = "dwd_traffic_user_jump_detail";
         unionDs.addSink(KafkaUtil.getFlinkKafkaProducer(sinkTopic));
 
