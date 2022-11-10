@@ -74,4 +74,48 @@ public class KafkaUtil {
                     }
                 }, properties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE);
     }
+
+    /**
+     * Kafka-Source DDL 语句
+     *
+     * @param topic   数据源主题
+     * @param groupId 消费者组
+     * @return 拼接好的 Kafka 数据源 DDL 语句
+     */
+    public static String getKafkaDDL(String topic, String groupId) {
+
+        return " with ('connector' = 'kafka', " +
+                " 'topic' = '" + topic + "'," +
+                " 'properties.bootstrap.servers' = '" + KAFKA_SERVER + "', " +
+                " 'properties.group.id' = '" + groupId + "', " +
+                " 'format' = 'json', " +
+                " 'scan.startup.mode' = 'group-offsets')";
+    }
+
+    /**
+     * Kafka-Sink DDL 语句
+     *
+     * @param topic 输出到 Kafka 的目标主题
+     * @return 拼接好的 Kafka-Sink DDL 语句
+     */
+    public static String getKafkaSinkDDL(String topic) {
+        return "WITH ( " +
+                "  'connector' = 'kafka', " +
+                "  'topic' = '" + topic + "', " +
+                "  'properties.bootstrap.servers' = '" + KAFKA_SERVER + "', " +
+                "  'format' = 'json' " +
+                ")";
+    }
+
+    public static String getTopicDb(String groupId) {
+        return "create table topic_db( " +
+                "`database` String, " +
+                "`table` String, " +
+                "`type` String, " +
+                "`data` Map<String,String>, " +
+                "`old` Map<String,String>, " +
+                "`pt` AS PROCTIME() " +
+                ")" + getKafkaDDL("topic_db", groupId);
+    }
 }
+
