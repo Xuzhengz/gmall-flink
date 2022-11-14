@@ -7,6 +7,8 @@ import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 
+import java.time.Duration;
+
 /**
  * @author 徐正洲
  * @date 2022/11/13-11:38
@@ -28,6 +30,9 @@ public class DwdTradeOrderPreProcess {
 //        env.setStateBackend(new HashMapStateBackend());
 //        env.getCheckpointConfig().setCheckpointStorage("hdfs://hadoop102:8020/gmall-flink/ck");
 //        System.setProperty("HADOOP_USER_NAME","root");
+
+        //设置状态的TTL 生产环境设置为最大乱序程度
+        tableEnv.getConfig().setIdleStateRetention(Duration.ofSeconds(5));
 
         //TODO 2.创建topic_db表
         tableEnv.executeSql(KafkaUtil.getTopicDb("Dwd_Trade_Order_Pre_Process"));
