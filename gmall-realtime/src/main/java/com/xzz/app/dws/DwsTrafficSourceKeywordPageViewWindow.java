@@ -1,7 +1,9 @@
 package com.xzz.app.dws;
 
 import com.xzz.app.function.SplitFunction;
+import com.xzz.bean.KeywordBean;
 import com.xzz.utils.KafkaUtil;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -11,7 +13,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
  * @create 2022-11-16 16:02
  */
 public class DwsTrafficSourceKeywordPageViewWindow {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         //    TODO 1. 获取执行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
@@ -31,7 +33,7 @@ public class DwsTrafficSourceKeywordPageViewWindow {
                 "create table page_log(  " +
                 "`page` map<string,string>, " +
                 "`ts` bigint, " +
-                "`rt` to_timestamp(from_unixtime(ts/1000)), " +
+                "`rt` as to_timestamp(from_unixtime(ts/1000)), " +
                 " watermark for rt as rt - interval '2' second " +
                 ")" + KafkaUtil.getKafkaDDL("dwd_traffic_page_log", "Page_View_Window"));
 
@@ -56,12 +58,26 @@ public class DwsTrafficSourceKeywordPageViewWindow {
                 "lateral table(SplitFunction(item))");
         tableEnv.createTemporaryView("split_table", splitTable);
         //    TODO 5. 分组、开窗、聚合
+        Table resultTable = tableEnv.sqlQuery("" +
+                "select  " +
+                " date_format(tumble_start(rt,interval '10' second),'yyyy-MM-dd HH:mm:ss') stt, " +
+                " date_format(tumble_start(rt,interval '10' second),'yyyy-MM-dd HH:mm:ss') edt, " +
+                " search' source, " +
+                " word keyword, " +
+                " count(*) keyword_count, " +
+                " unix_timestamp()*1000 ts " +
+                " from " +
+                " split_table  " +
+                " group by word,tumble(rt,interval '10' second)");
 
-        //    TODO 6. 将动态表转成流
-
+        //    TODO 6. 将动态表转成流--字段名与bean的属性名字要一致，顺序无所谓。
+        DataStream<KeywordBean> keywordBeanDataStream = tableEnv.toAppendStream(resultTable, KeywordBean.class);
+        keywordBeanDataStream.print();
         //    TODO 7. 将数据写入ck
+//        keywordBeanDataStream.addSink();
 
         //    TODO 8. 启动
+        env.execute();
 
     }
 }
