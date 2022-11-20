@@ -3,10 +3,14 @@ package com.xzz.app.dws;
 import com.xzz.app.function.SplitFunction;
 import com.xzz.bean.KeywordBean;
 import com.xzz.utils.KafkaUtil;
+import com.xzz.utils.MyClickhouseUtil;
+import org.apache.flink.connector.jdbc.JdbcSink;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+
+import java.security.Key;
 
 /**
  * @author 徐正洲
@@ -61,8 +65,8 @@ public class DwsTrafficSourceKeywordPageViewWindow {
         Table resultTable = tableEnv.sqlQuery("" +
                 "select  " +
                 " date_format(tumble_start(rt,interval '10' second),'yyyy-MM-dd HH:mm:ss') stt, " +
-                " date_format(tumble_start(rt,interval '10' second),'yyyy-MM-dd HH:mm:ss') edt, " +
-                " search' source, " +
+                " date_format(tumble_end(rt,interval '10' second),'yyyy-MM-dd HH:mm:ss') edt, " +
+                " 'search' source, " +
                 " word keyword, " +
                 " count(*) keyword_count, " +
                 " unix_timestamp()*1000 ts " +
@@ -72,9 +76,11 @@ public class DwsTrafficSourceKeywordPageViewWindow {
 
         //    TODO 6. 将动态表转成流--字段名与bean的属性名字要一致，顺序无所谓。
         DataStream<KeywordBean> keywordBeanDataStream = tableEnv.toAppendStream(resultTable, KeywordBean.class);
-        keywordBeanDataStream.print();
+
         //    TODO 7. 将数据写入ck
-//        keywordBeanDataStream.addSink();
+        keywordBeanDataStream.addSink(MyClickhouseUtil.<KeywordBean>getClickhouseSink(
+                "insert into dws_traffic_source_keyword_page_view_window values(?,?,?,?,?,?)"
+        ));
 
         //    TODO 8. 启动
         env.execute();
