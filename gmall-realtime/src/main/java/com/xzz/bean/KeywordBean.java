@@ -19,7 +19,7 @@ public class KeywordBean {
     private String stt;
     private String edt;
 
-    @TransientSink
+//    @TransientSink
     private String source;
     private String keyword;
     private Long keyword_count;
