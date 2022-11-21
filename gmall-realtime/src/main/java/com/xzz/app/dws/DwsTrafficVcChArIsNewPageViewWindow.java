@@ -69,7 +69,7 @@ public class DwsTrafficVcChArIsNewPageViewWindow {
                     jsonObject.getLong("ts")
             );
         });
-        SingleOutputStreamOperator<TrafficPageViewBean> uj = uvStream.map(data -> {
+        SingleOutputStreamOperator<TrafficPageViewBean> uj = ujStream.map(data -> {
             JSONObject jsonObject = JSON.parseObject(data);
 
             JSONObject common = jsonObject.getJSONObject("common");
@@ -84,7 +84,7 @@ public class DwsTrafficVcChArIsNewPageViewWindow {
             );
         });
 
-        SingleOutputStreamOperator<TrafficPageViewBean> page = uvStream.map(data -> {
+        SingleOutputStreamOperator<TrafficPageViewBean> page = pageStream.map(data -> {
             JSONObject jsonObject = JSON.parseObject(data);
 
             JSONObject common = jsonObject.getJSONObject("common");
