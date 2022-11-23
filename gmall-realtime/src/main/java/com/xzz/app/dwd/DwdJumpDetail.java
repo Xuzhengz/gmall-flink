@@ -57,7 +57,6 @@ public class DwdJumpDetail {
         KeyedStream<JSONObject, String> keyedStream = jsonObj.assignTimestampsAndWatermarks(WatermarkStrategy.<JSONObject>forBoundedOutOfOrderness(Duration.ofSeconds(2)).withTimestampAssigner(new SerializableTimestampAssigner<JSONObject>() {
             @Override
             public long extractTimestamp(JSONObject jsonObject, long l) {
-                System.out.println(jsonObject.getLong("ts"));
                 return jsonObject.getLong("ts");
             }
         })).keyBy(data -> data.getJSONObject("common").getString("mid"));

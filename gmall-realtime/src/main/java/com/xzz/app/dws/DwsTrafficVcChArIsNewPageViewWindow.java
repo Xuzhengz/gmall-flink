@@ -140,7 +140,7 @@ public class DwsTrafficVcChArIsNewPageViewWindow {
                 TrafficPageViewBean next = iterable.iterator().next();
 
                 next.setStt(DateFormatUtil.toYmdHms(timeWindow.getStart()));
-                next.setStt(DateFormatUtil.toYmdHms(timeWindow.getEnd()));
+                next.setEdt(DateFormatUtil.toYmdHms(timeWindow.getEnd()));
 
                 next.setTs(System.currentTimeMillis());
 
