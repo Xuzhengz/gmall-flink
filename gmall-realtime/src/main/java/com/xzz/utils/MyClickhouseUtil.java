@@ -18,7 +18,6 @@ import java.sql.SQLException;
  * @date 2022/11/20-19:37
  */
 public class MyClickhouseUtil {
-
     public static <T> SinkFunction<T> getClickhouseSink(String sql) {
 
         return JdbcSink.sink(sql,
@@ -56,6 +55,7 @@ public class MyClickhouseUtil {
                 new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
                         .withDriverName(GmallConfig.CLICKHOUSE_DRIVER)
                         .withUrl(GmallConfig.CLICKHOUSE_URL)
+                        .withPassword("root")
                         .build()
         );
 

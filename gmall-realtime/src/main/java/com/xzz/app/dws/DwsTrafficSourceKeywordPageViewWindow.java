@@ -77,6 +77,8 @@ public class DwsTrafficSourceKeywordPageViewWindow {
         //    TODO 6. 将动态表转成流--字段名与bean的属性名字要一致，顺序无所谓。
         DataStream<KeywordBean> keywordBeanDataStream = tableEnv.toAppendStream(resultTable, KeywordBean.class);
 
+        keywordBeanDataStream.print();
+
         //    TODO 7. 将数据写入ck
         keywordBeanDataStream.addSink(MyClickhouseUtil.<KeywordBean>getClickhouseSink(
                 "insert into dws_traffic_source_keyword_page_view_window values(?,?,?,?,?,?)"
