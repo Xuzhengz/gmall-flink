@@ -114,6 +114,7 @@ public class KafkaUtil {
                 "`type` String, " +
                 "`data` Map<String,String>, " +
                 "`old` Map<String,String>, " +
+                "`ts` string, " +
                 "`pt` AS PROCTIME() " +
                 ")" + getKafkaDDL("topic_db", groupId);
     }

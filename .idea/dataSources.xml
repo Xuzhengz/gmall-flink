@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="ClickHouse - gmall@hadoop102" uuid="f3b93ae9-1011-4355-ba68-797ae2fd8ef1">
+      <driver-ref>clickhouse</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>ru.yandex.clickhouse.ClickHouseDriver</jdbc-driver>
+      <jdbc-url>jdbc:clickhouse://hadoop102:8123/gmall</jdbc-url>
+    </data-source>
+  </component>
+</project>

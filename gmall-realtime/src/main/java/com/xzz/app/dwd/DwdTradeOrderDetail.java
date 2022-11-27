@@ -71,7 +71,8 @@ public class DwdTradeOrderDetail {
                 "    `coupon_id` string, " +
                 "    `coupon_use_id` string, " +
                 "    `type` string, " +
-                "    `old` map<string,string> " +
+                "    `old` map<string,string>, " +
+                "    `row_op_ts` timestamp_ltz(3) " +
                 ") "
                 + KafkaUtil.getKafkaDDL("dwd_trade_order_pre_process", "OrderDetail"));
 
@@ -94,10 +95,11 @@ public class DwdTradeOrderDetail {
                 "source_type_name, " +
                 "split_activity_amount, " +
                 "split_coupon_amount, " +
-                "split_total_amount " +
+                "split_total_amount, " +
+                "row_op_ts " +
                 "from dwd_order_pre " +
                 "where `type`='insert'");
-        tableEnv.createTemporaryView("filterTable",filterTable);
+        tableEnv.createTemporaryView("filterTable", filterTable);
 
         //TODO 4.下单dwd层下单数据表
         tableEnv.executeSql("" +
@@ -119,10 +121,11 @@ public class DwdTradeOrderDetail {
                 "source_type_name string, " +
                 "split_activity_amount string, " +
                 "split_coupon_amount string, " +
-                "split_total_amount string " +
+                "split_total_amount string, " +
+                "row_op_ts timestamp_ltz(3) " +
                 ")" + KafkaUtil.getKafkaSinkDDL("dwd_trade_order_detail"));
 
-        
+
         //TODO 5.写出
         tableEnv.sqlQuery("insert into dwd_trade_order_detail select * from filterTable");
 

@@ -65,7 +65,8 @@ public class DwdTradePayDetailSuc {
                 "source_type_name string, " +
                 "split_activity_amount string, " +
                 "split_coupon_amount string, " +
-                "split_total_amount string " +
+                "split_total_amount string, " +
+                "row_op_ts timestamp_ltz(3) " +
                 ")" + KafkaUtil.getKafkaDDL("dwd_trade_order_detail","PayDetailSuc"));
         
 
@@ -94,7 +95,8 @@ public class DwdTradePayDetailSuc {
                 "od.order_price, " +
                 "od.split_activity_amount, " +
                 "od.split_coupon_amount, " +
-                "od.split_total_amount split_payment_amount " +
+                "od.split_total_amount split_payment_amount, " +
+                "od.row_op_ts row_op_ts " +
                 "from payment_info pi " +
                 "join dwd_trade_order_detail od " +
                 "on pi.order_id = od.order_id " +
@@ -125,6 +127,7 @@ public class DwdTradePayDetailSuc {
                 "split_activity_amount string," +
                 "split_coupon_amount string," +
                 "split_payment_amount string," +
+                "row_op_ts timestamp_ltz(3), " +
                 "primary key(order_detail_id) not enforced" +
                 ")" + KafkaUtil.getUpsertKafkaDDL("dwd_trade_pay_detail_suc"));
 

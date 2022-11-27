@@ -43,4 +43,7 @@ public class DateFormatUtil {
         return dtfFull.format(localDateTime);
     }
 
+    public static void main(String[] args) {
+        System.out.println(toTs("2022-10-19 17:09:57",true));
+    }
 }

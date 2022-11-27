@@ -7,6 +7,7 @@ import com.xzz.utils.KafkaUtil;
 import com.xzz.utils.MyClickhouseUtil;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
@@ -58,7 +59,7 @@ public class DwsUserUserLoginWindow {
                 String uid = jsonObject.getJSONObject("common").getString("uid");
                 String lastPage = jsonObject.getJSONObject("page").getString("last_page_id");
 
-                if (uid != null && (lastPage.equals("login") || lastPage == null)) {
+                if (uid != null && (lastPage == null || lastPage.equals("login"))) {
                     collector.collect(jsonObject);
                 }
             }
@@ -99,7 +100,7 @@ public class DwsUserUserLoginWindow {
                 } else if (!lastLoginDate.equals(currentDate)) {
                     uv = 1L;
                     lastLoginState.update(currentDate);
-                    if ((DateFormatUtil.toTs(currentDate) - (DateFormatUtil.toTs(lastLoginDate)) / (24 * 60 * 60 * 1000L)) >= 8L) {
+                    if ((DateFormatUtil.toTs(currentDate) - DateFormatUtil.toTs(lastLoginDate)) / (24 * 60 * 60 * 1000L) >= 8L) {
                         backUv = 1L;
                     }
                 }

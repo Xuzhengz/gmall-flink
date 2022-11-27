@@ -143,6 +143,7 @@ public class DwsTradeCartAddUuWindow {
                 });
 
         //      TODO 8. 写出ck
+        resultDs.print("result：");
         resultDs.addSink(MyClickhouseUtil.getClickhouseSink("insert into dws_trade_cart_add_uu_window values(?,?,?,?)"));
 
         //      TODO 9. 启动

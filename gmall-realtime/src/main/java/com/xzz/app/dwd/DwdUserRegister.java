@@ -1,6 +1,10 @@
 package com.xzz.app.dwd;
 
 import com.xzz.utils.KafkaUtil;
+import org.apache.flink.api.common.restartstrategy.RestartStrategies;
+import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
+import org.apache.flink.streaming.api.CheckpointingMode;
+import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -16,11 +20,11 @@ import java.time.ZoneId;
 public class DwdUserRegister {
     public static void main(String[] args) throws Exception {
 
+
         // TODO 1. 环境准备
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(4);
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
-        tableEnv.getConfig().setLocalTimeZone(ZoneId.of("GMT+8"));
 
         // TODO 2. 启用状态后端
 //        env.enableCheckpointing(3000L, CheckpointingMode.EXACTLY_ONCE);
@@ -37,7 +41,13 @@ public class DwdUserRegister {
 //        System.setProperty("HADOOP_USER_NAME", "atguigu");
 
         // TODO 3. 从 Kafka 读取业务数据，封装为 Flink SQL 表
-        tableEnv.executeSql(KafkaUtil.getTopicDb("dwd_trade_order_detail"));
+        tableEnv.executeSql("create table topic_db(" +
+                "`database` string, " +
+                "`table` string, " +
+                "`type` string, " +
+                "`data` map<string, string>, " +
+                "`ts` string " +
+                ")" + KafkaUtil.getKafkaDDL("topic_db", "dwd_trade_order_detail"));
 
         // TODO 4. 读取用户表数据
         Table userInfo = tableEnv.sqlQuery("select " +
@@ -65,6 +75,8 @@ public class DwdUserRegister {
                 "create_time, " +
                 "ts " +
                 "from user_info");
+
+
 
     }
 
