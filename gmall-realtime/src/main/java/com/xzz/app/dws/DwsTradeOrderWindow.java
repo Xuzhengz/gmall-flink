@@ -2,7 +2,6 @@ package com.xzz.app.dws;
 
 import com.alibaba.fastjson.JSONObject;
 import com.xzz.bean.TradeOrderBean;
-import com.xzz.bean.TradePaymentWindowBean;
 import com.xzz.utils.DateFormatUtil;
 import com.xzz.utils.KafkaUtil;
 import com.xzz.utils.MyClickhouseUtil;
@@ -28,6 +27,8 @@ import java.time.Duration;
 /**
  * @author 徐正洲
  * @date 2022/11/27-19:35
+ *
+ * 交易域下单各窗口汇总表
  */
 public class DwsTradeOrderWindow {
     public static void main(String[] args) throws Exception {

@@ -7,7 +7,6 @@ import com.xzz.utils.KafkaUtil;
 import com.xzz.utils.MyClickhouseUtil;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
@@ -25,11 +24,13 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
 import java.time.Duration;
-import java.util.Date;
 
 /**
  * @author 徐正洲
  * @date 2022/11/24-20:25
+ *
+ *
+ * 用户域用户登陆各窗口汇总表
  */
 public class DwsUserUserLoginWindow {
     public static void main(String[] args) throws Exception {

@@ -158,6 +158,21 @@
         </dependency>
 
 
+        <!-->实现json下划线key与javabean驼峰属性互转 <-->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.1-jre</version>
+        </dependency>
+
+        <!-->实现泛型类型get与set方法 <-->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.3</version>
+        </dependency>
+
+
 
     </dependencies>
 

@@ -20,15 +20,16 @@ import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
-import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.util.Collector;
-import ru.yandex.clickhouse.ClickHouseUtil;
 
 import java.time.Duration;
 
 /**
  * @author 徐正洲
  * @date 2022/11/21-20:38
+ *
+ *
+ * 流量域版本-渠道-地区-访客类别粒度页面浏览各窗口汇总表
  */
 public class DwsTrafficVcChArIsNewPageViewWindow {
     public static void main(String[] args) throws Exception {

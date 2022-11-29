@@ -30,6 +30,8 @@ import java.time.Duration;
 /**
  * @author 徐正洲
  * @date 2022/11/26-19:24
+ *
+ * 交易域支付各窗口汇总表
  */
 public class DwsTradePaymentSucWindow {
     public static void main(String[] args) throws Exception {

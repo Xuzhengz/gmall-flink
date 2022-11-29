@@ -4,17 +4,18 @@ import com.xzz.app.function.SplitFunction;
 import com.xzz.bean.KeywordBean;
 import com.xzz.utils.KafkaUtil;
 import com.xzz.utils.MyClickhouseUtil;
-import org.apache.flink.connector.jdbc.JdbcSink;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
-import java.security.Key;
 
 /**
  * @author 徐正洲
  * @create 2022-11-16 16:02
+ *
+ *
+ * 流量域来源关键词粒度页面浏览各窗口汇总表
  */
 public class DwsTrafficSourceKeywordPageViewWindow {
     public static void main(String[] args) throws Exception {

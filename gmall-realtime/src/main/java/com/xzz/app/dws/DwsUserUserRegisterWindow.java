@@ -22,6 +22,8 @@ import java.time.Duration;
 /**
  * @author 徐正洲
  * @create 2022-11-25 16:48
+ *
+ * 用户域用户注册各窗口汇总表
  */
 public class DwsUserUserRegisterWindow {
     public static void main(String[] args) throws Exception {

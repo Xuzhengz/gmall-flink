@@ -2,7 +2,6 @@ package com.xzz.app.dws;
 
 import com.alibaba.fastjson.JSONObject;
 import com.xzz.bean.CartAddUuBean;
-import com.xzz.bean.UserRegisterBean;
 import com.xzz.utils.DateFormatUtil;
 import com.xzz.utils.KafkaUtil;
 import com.xzz.utils.MyClickhouseUtil;
@@ -24,13 +23,15 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindo
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
-import org.checkerframework.checker.formatter.FormatUtil;
 
 import java.time.Duration;
 
 /**
  * @author 徐正洲
  * @create 2022-11-25 17:22
+ *
+ *
+ * 交易域加购各窗口汇总表
  */
 public class DwsTradeCartAddUuWindow {
     public static void main(String[] args) throws Exception {

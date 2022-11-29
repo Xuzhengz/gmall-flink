@@ -5,7 +5,6 @@ import com.xzz.bean.TrafficHomeDetailPageViewBean;
 import com.xzz.utils.DateFormatUtil;
 import com.xzz.utils.KafkaUtil;
 import com.xzz.utils.MyClickhouseUtil;
-import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.FlatMapFunction;
@@ -15,27 +14,23 @@ import org.apache.flink.api.common.state.StateTtlConfig;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.time.Time;
-import org.apache.flink.api.common.typeutils.TypeSerializer;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.AllWindowFunction;
-import org.apache.flink.streaming.api.scala.function.WindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.assigners.WindowAssigner;
-import org.apache.flink.streaming.api.windowing.triggers.Trigger;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
-import org.apache.flink.streaming.api.windowing.windows.Window;
 import org.apache.flink.util.Collector;
 
 import java.time.Duration;
-import java.util.Collection;
 
 /**
  * @author 徐正洲
  * @date 2022/11/23-20:51
+ *
+ * 流量域页面浏览各窗口汇总表
  */
 public class DwsTrafficPageViewWindow {
     public static void main(String[] args) throws Exception {
