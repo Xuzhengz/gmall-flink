@@ -29,7 +29,7 @@ import java.time.Duration;
 /**
  * @author 徐正洲
  * @date 2022/11/23-20:51
- *
+ * <p>
  * 流量域页面浏览各窗口汇总表
  */
 public class DwsTrafficPageViewWindow {
@@ -111,15 +111,19 @@ public class DwsTrafficPageViewWindow {
 
                 Long homeCt = 0L;
                 Long detailCt = 0L;
+                if ("home".equals(jsonObject.getJSONObject("page").getString("page_id"))) {
+                    if (homeLastDate == null || !homeLastDate.equals(currentDate)) {
+                        homeCt = 1L;
+                        homeState.update(currentDate);
+                    }
+                }else {
+                    if (detailLastDate == null || !detailLastDate.equals(currentDate)) {
+                        detailCt = 1L;
+                        detailState.update(currentDate);
+                    }
+                }
 
-                if (homeLastDate == null || !homeLastDate.equals(currentDate)) {
-                    homeCt = 1L;
-                    homeState.update(currentDate);
-                }
-                if (detailLastDate == null || !detailLastDate.equals(currentDate)) {
-                    detailCt = 1L;
-                    detailState.update(currentDate);
-                }
+
 
                 //满足任何一个数据不为0 则写出
                 if (homeCt == 1L || detailCt == 1L) {
