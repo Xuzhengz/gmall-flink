@@ -3,6 +3,7 @@ package com.xzz.app.function;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
 import com.alibaba.fastjson.JSONObject;
+import com.xzz.utils.DimUtil;
 import com.xzz.utils.DruidUtil;
 import com.xzz.utils.PhoneixUtil;
 import org.apache.flink.configuration.Configuration;
@@ -34,9 +35,16 @@ public class PhoneixSink extends RichSinkFunction<JSONObject> {
     public void invoke(JSONObject value, Context context) throws Exception {
         //获取连接
         DruidPooledConnection connection = druidDataSource.getConnection();
-        //写出数据
+
+        //获取数据类型
+        String type = value.getString("type");
         String sinkTable = value.getString("sinkTable");
         JSONObject data = value.getJSONObject("data");
+
+        if (type == "update") {
+            DimUtil.delDimInfo(sinkTable.toUpperCase(), value.getString("id"));
+        }
+        //写出数据
         PhoneixUtil.upsertValues(connection, sinkTable, data);
 
         //关闭连接
