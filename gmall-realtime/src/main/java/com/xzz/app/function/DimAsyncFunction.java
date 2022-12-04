@@ -44,20 +44,20 @@ public abstract class DimAsyncFunction<T> extends RichAsyncFunction<T, T> implem
 
                     // 查询维表信息
                     String key = getKey(t);
+
                     JSONObject dimInfo = DimUtil.getDimInfo(connection, tableName, key);
 
                     //维度信息补充到当前数据
                     if (dimInfo != null) {
                         join(t, dimInfo);
                     }
+                    //写出
+                    resultFuture.complete(Collections.singletonList(t));
 
                     //关闭连接
                     connection.close();
 
-                    //写出
-                    resultFuture.complete(Collections.singletonList(t));
                 } catch (Exception e) {
-                    e.printStackTrace();
                     System.out.println("关联维表失败：" + t + ",Table：" + tableName);
                 }
 

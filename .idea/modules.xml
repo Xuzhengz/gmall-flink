@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/gamll-publisher/.mvn/.mvn.iml" filepath="$PROJECT_DIR$/gamll-publisher/.mvn/.mvn.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gmall-publisher/.mvn/.mvn.iml" filepath="$PROJECT_DIR$/gmall-publisher/.mvn/.mvn.iml" />
     </modules>
   </component>
 </project>

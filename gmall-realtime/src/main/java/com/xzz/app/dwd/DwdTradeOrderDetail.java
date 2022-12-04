@@ -127,9 +127,7 @@ public class DwdTradeOrderDetail {
 
 
         //TODO 5.写出
-        tableEnv.sqlQuery("insert into dwd_trade_order_detail select * from filterTable");
+        tableEnv.executeSql("insert into dwd_trade_order_detail select * from filterTable");
 
-        //TODO 6.启动
-        env.execute();
     }
 }

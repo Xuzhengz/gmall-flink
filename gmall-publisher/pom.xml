@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.xzz</groupId>
-    <artifactId>gamll-publisher</artifactId>
+    <artifactId>gmall-publisher</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>gamll-publisher</name>
     <description>gamll-publisher</description>

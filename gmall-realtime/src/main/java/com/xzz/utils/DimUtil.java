@@ -41,7 +41,7 @@ public class DimUtil {
         }
 
 
-        String sql = "select * from" + GmallConfig.HBASE_SCHEMA + "." + tableName + " where id = '" + key + "'";
+        String sql = "select * from " + GmallConfig.HBASE_SCHEMA + "." + tableName + " where id = '" + key + "'";
         System.out.println(sql);
 
         List<JSONObject> jsonObjects = JdbcUtil.queryList(connection, sql, JSONObject.class, false);
