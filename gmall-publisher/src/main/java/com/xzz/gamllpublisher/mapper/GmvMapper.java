@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 public interface GmvMapper {
 
     //查询ck 获取gmv总数
-    @Select("select sum(order_amount) from dwd_trade_province_order_window where toYYYYMMDD(stt)=#(date)")
-    BigDecimal selectGmv(int date);
+    @Select("select sum(order_amount) from dws_trade_user_spu_order_window where toYYYYMMDD(stt)=#{date}")
+    Double selectGmv(int date);
 
 }

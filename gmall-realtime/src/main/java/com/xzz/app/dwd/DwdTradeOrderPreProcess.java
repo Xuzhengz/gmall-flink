@@ -57,8 +57,7 @@ public class DwdTradeOrderPreProcess {
                 "where `database` = 'gmall' " +
                 "and `table` = 'order_detail'  " +
                 "and `type` = 'insert'");
-        tableEnv.createTemporaryView("orderTable", orderTable);
-        tableEnv.toAppendStream(orderTable, Row.class).print();
+        tableEnv.createTemporaryView("order_detail_table", orderTable);
 
         //TODO 4.过滤订单数据
         Table orderInfoTable = tableEnv.sqlQuery("" +
@@ -94,7 +93,7 @@ public class DwdTradeOrderPreProcess {
                 "and `table` = 'order_info'  " +
                 "and (`type` = 'insert' or `type` = 'update')");
 
-        tableEnv.createTemporaryView("orderInfoTable", orderInfoTable);
+        tableEnv.createTemporaryView("order_info_table", orderInfoTable);
         tableEnv.toAppendStream(orderInfoTable, Row.class).print();
 
         //TODO 5.过滤出订单明细活动关联数据
@@ -112,25 +111,25 @@ public class DwdTradeOrderPreProcess {
                 "and `table` = 'order_detail_activity'  " +
                 "and `type` = 'insert'");
 
-        tableEnv.createTemporaryView("orderDetailActivity", orderDetailActivity);
+        tableEnv.createTemporaryView("order_activity_table", orderDetailActivity);
         tableEnv.toAppendStream(orderDetailActivity, Row.class).print();
 
         //TODO 6.过滤出订单明细加购物卷关联数据
         Table orderDetailCoupon = tableEnv.sqlQuery("" +
                 "select " +
-                "    data['id'], " +
-                "    data['order_id'], " +
-                "    data['order_detail_id'], " +
-                "    data['coupon_id'], " +
-                "    data['coupon_use_id'], " +
-                "    data['sku_id'], " +
-                "    data['create_time'] " +
+                "    data['id'] id, " +
+                "    data['order_id'] order_id, " +
+                "    data['order_detail_id'] order_detail_id, " +
+                "    data['coupon_id'] coupon_id, " +
+                "    data['coupon_use_id'] coupon_use_id, " +
+                "    data['sku_id'] sku_id, " +
+                "    data['create_time'] create_time " +
                 "from topic_db " +
                 "where `database` = 'gmall' " +
                 "and `table` = 'order_detail_coupon'  " +
                 "and `type` = 'insert'");
 
-        tableEnv.createTemporaryView("orderDetailCoupon", orderDetailCoupon);
+        tableEnv.createTemporaryView("order_coupon_table", orderDetailCoupon);
         tableEnv.toAppendStream(orderDetailCoupon, Row.class).print();
 
         //TODO 7.创建 base_dic lookup表
@@ -182,7 +181,7 @@ public class DwdTradeOrderPreProcess {
                 "    oc.coupon_use_id, " +
                 "    oi.`type`, " +
                 "    oi.`old`, " +
-                "    current_row_timestamp() row_op_ts, " +
+                "    current_row_timestamp() row_op_ts " +
                 "from order_detail_table od " +
                 "join order_info_table oi " +
                 "on od.order_id = oi.id " +
@@ -239,16 +238,15 @@ public class DwdTradeOrderPreProcess {
                 "    `coupon_id` string, " +
                 "    `coupon_use_id` string, " +
                 "    `type` string, " +
-                "    `old` map<string,string> " +
-                "    `row_op_ts` timestamp_ltz(3) " +
+                "    `old` map<string,string>, " +
+                "    `row_op_ts` timestamp_ltz(3), " +
+                "    primary key(id) not enforced " +
                 ") "
         +KafkaUtil.getUpsertKafkaDDL("dwd_trade_order_pre_process"));
 
 
         //TODO 10.将数据写出
-        tableEnv.sqlQuery("insert into dwd_order_pre select * from dwdOrderPreTable");
+        tableEnv.executeSql("insert into dwd_order_pre select * from dwdOrderPreTable");
 
-        //TODO 11.启动
-        env.execute();
     }
 }

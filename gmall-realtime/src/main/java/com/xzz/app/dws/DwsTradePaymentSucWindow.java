@@ -144,7 +144,7 @@ public class DwsTradePaymentSucWindow {
                 }
 
                 if (pay == 1L) {
-                    collector.collect(new TradePaymentWindowBean("", "", pay, newPay, null));
+                    collector.collect(new TradePaymentWindowBean("", "", pay, newPay, System.currentTimeMillis()));
                 }
 
             }
@@ -169,7 +169,7 @@ public class DwsTradePaymentSucWindow {
                 });
 
         //TODO 写出ck
-        resultDs.print("result::");
+        resultDs.print("result>>>>");
         resultDs.addSink(MyClickhouseUtil.getClickhouseSink("insert into dws_trade_payment_suc_window values(?,?,?,?,?)"));
 
 

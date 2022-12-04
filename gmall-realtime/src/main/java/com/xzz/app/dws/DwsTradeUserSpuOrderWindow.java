@@ -194,7 +194,7 @@ public class DwsTradeUserSpuOrderWindow {
         // 关联TM表
         SingleOutputStreamOperator<TradeUserSpuOrderBean> tmDs = AsyncDataStream.unorderedWait(
                 spuDs,
-                new DimAsyncFunction<TradeUserSpuOrderBean>("DIM_BASE_TRADMARK") {
+                new DimAsyncFunction<TradeUserSpuOrderBean>("DIM_BASE_TRADEMARK") {
                     @Override
                     public String getKey(TradeUserSpuOrderBean tradeUserSpuOrderBean) {
                         return tradeUserSpuOrderBean.getTrademarkId();

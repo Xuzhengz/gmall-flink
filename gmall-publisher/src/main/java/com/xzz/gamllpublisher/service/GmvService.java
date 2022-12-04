@@ -9,7 +9,9 @@ import java.math.BigDecimal;
 public interface GmvService {
 
     //获取总数
-    BigDecimal getGmv(int date);
+    Double getGmv(int date);
+
+    String message();
 
 
 }

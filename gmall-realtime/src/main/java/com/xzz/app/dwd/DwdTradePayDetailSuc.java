@@ -44,6 +44,7 @@ public class DwdTradePayDetailSuc {
         );
         tableEnv.createTemporaryView("payment_info", paymentInfo);
 
+        tableEnv.toDataStream(paymentInfo).print();
 
         //TODO 3.消费下单主题数据
         tableEnv.executeSql("" +
@@ -132,9 +133,7 @@ public class DwdTradePayDetailSuc {
                 ")" + KafkaUtil.getUpsertKafkaDDL("dwd_trade_pay_detail_suc"));
 
         //TODO 7.写出
-        tableEnv.sqlQuery("insert into dwd_trade_pay_detail_suc select * from result_table");
+        tableEnv.executeSql("insert into dwd_trade_pay_detail_suc select * from result_table");
 
-        //TODO 8.启动
-        env.execute();
     }
 }

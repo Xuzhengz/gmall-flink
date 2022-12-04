@@ -16,46 +16,73 @@ import java.util.List;
  */
 public class JdbcUtil {
 
-    public static <T> List<T> queryList(Connection connection, String sql, Class<T> tClass, Boolean underScore) throws SQLException, IllegalAccessException, InstantiationException, InvocationTargetException {
-        ArrayList<T> list = new ArrayList<>();
+    /**
+     * Phoenix 表查询方法
+     *
+     * @param conn 数据库连接对象
+     * @param sql  查询数据的 SQL 语句
+     * @param clz  返回的集合元素类型的 class 对象
+     * @param <T>  返回的集合元素类型
+     * @return 封装为 List<T> 的查询结果
+     */
+    public static <T> List<T> queryList(Connection conn, String sql, Class<T> clz, boolean underScore) {
+        List<T> resList = new ArrayList<>();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            //获取数据库操作对象
+            ps = conn.prepareStatement(sql);
+            //执行SQL语句
+            rs = ps.executeQuery();
 
+            /**处理结果集
+             +-----+----------+
+             | ID  | TM_NAME  |
+             +-----+----------+
+             | 17  | lzls     |
+             | 18  | mm       |
 
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+             class TM{id,tm_name}
+             */
+            ResultSetMetaData metaData = rs.getMetaData();
+            while (rs.next()) {
+                //通过反射，创建对象，用于封装查询结果
+                T obj = clz.newInstance();
+                for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                    String columnName = metaData.getColumnName(i);
+                    Object columnValue = rs.getObject(i);
 
-        ResultSet resultSet = preparedStatement.executeQuery();
+                    //判断是否需要下划线和驼峰属性进行转换
+                    if (underScore) {
+                        columnName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, columnName.toLowerCase());
+                    }
 
-        ResultSetMetaData metaData = resultSet.getMetaData();
-        int columnCount = metaData.getColumnCount();
-
-
-        //遍历结果集，转成T对象加入集合
-        while (resultSet.next()) {
-            //创建T对象
-            T t = tClass.newInstance();
-
-
-            //列遍历
-            for (int i = 1; i < columnCount + 1; i++) {
-                String columnName = metaData.getColumnName(i);
-                Object value = resultSet.getObject(columnName);
-
-                //判断是否需要下划线和驼峰属性进行转换
-                if (underScore) {
-                    columnName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, columnName.toLowerCase());
+                    BeanUtils.setProperty(obj, columnName, columnValue);
                 }
-
-                //赋值
-                BeanUtils.setProperty(t, columnName, value);
+                resList.add(obj);
             }
 
-            preparedStatement.close();
-            resultSet.close();
-
-            //T对象加入集合
-            list.add(t);
-
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("从phoenix数据库中查询数据发送异常了~~");
+        } finally {
+            //释放资源
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-
-        return list;
+        return resList;
     }
+
 }
